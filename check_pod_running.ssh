@@ -1,0 +1,32 @@
+#!/bin/bash
+
+
+#this script will check status of the pods on current context
+#echo "count Status"
+#kubectl get pods | awk {'print $3'} | tail -n +2 | sort -n | uniq -c | while read COUNT STATUS 
+#do
+#	echo "${COUNT} ${STATUS}"
+#done
+#exit 0
+
+
+
+
+
+N=0
+kubectl config get-contexts | tail -n +2 | awk {'print $NF'} | while read NAME_SPACE
+do
+	((N++))
+	for i in "${NAME_SPACE}"
+		do
+			echo ""
+			kubectl config use-context "${NAME_SPACE}" &>/dev/null
+			echo "${N} Checking this Namespace:--> ${NAME_SPACE}  found below results" 
+			echo ""
+			echo "Status  Name"
+			kubectl get pods | tail -n +2 | awk '{print $3 " " $1}' | grep -v 'Completed\|Running'
+			echo "<------------------->"
+			
+	done
+done
+exit 0
