@@ -14,27 +14,66 @@
 
 
 
-N=0
-kubectl config get-contexts | tail -n +2 | awk {'print $NF'} | while read NAME_SPACE
-do
-	((N++))
-	for i in "${NAME_SPACE}"
-		do
-			echo ""
-			kubectl config use-context "${NAME_SPACE}" &>/dev/null
-			echo "Namespace:${NAME_SPACE}"
-			echo ""
-			echo "Status  	            Pod_Name"
-			kubectl get pods | tail -n +2 | awk '{print $3 "    " $1}' | grep -v 'Completed\|Running'
+#N=0
+#kubectl config get-contexts | tail -n +2 | awk {'print $NF'} | while read NAME_SPACE
+#do
+#	((N++))
+#	for i in "${NAME_SPACE}"
+#		do
+#			echo ""
+#			kubectl config use-context "${NAME_SPACE}" &>/dev/null
+#			echo "Namespace:${NAME_SPACE}"
+#			echo ""
+#			echo "Status  	            Pod_Name"
+#			kubectl get pods | tail -n +2 | awk '{print $3 "    " $1}' | grep -v 'Completed\|Running'
+#
+#
+#			if [[ "${?}" != 0 ]]
+#				then
+#					echo ""
+#					echo "OOPS, Check your VPN or Contact your Admin, please"
+#					date
+#					echo "<--------------------------->"
+#					exit 1
+#			fi
+#
+#			date
+#			echo "<------------------->"
+#
 
-			if [[ "${?}" != 0 ]]
-				then
-					echo ""
-					echo "OOPS, Check your VPN or Contact your Admin, please"
-					date
-					echo "<--------------------------->"
-					exit 1
-			fi
 
-			date
-			echo "<------------------->"
+
+
+#!/bin/bash
+#this script will check status of the pods on current context
+namespaces=$(kubectl config get-contexts | tail -n +2 | awk {'print $NF'})
+
+for ns in $namespaces; do
+	kubectl config use-context "${ns}" &>/dev/null
+	echo "**********************************"
+	echo "Namespace:" $ns        
+	echo "**********************************"
+	total_pods=$(kubectl get pods | tail -n +2 | sort -n | wc -l)
+	total_error_crash_pods=$(kubectl get pods | tail -n +2 | awk '{print $3 "    " $1}' | grep -v 'Completed\|Running' | wc -l)
+
+
+	crash_pods=$(kubectl get pods | tail -n +2 | grep  'CrashLoopBackOff' | awk '{print  $1}')
+	error_pods=$(kubectl get pods | tail -n +2 | grep  'Error' | awk '{print  $1}')
+	
+	echo "Crashloop:"
+		for cp in $crash_pods; do
+			echo " - " $cp
+		done	
+
+	echo "Error:"
+		for rp in $error_pods; do
+			echo " - " $rp
+		done
+
+
+	echo
+	echo Healthy: $total_error_crash_pods/$total_pods pods
+	echo "---------------------------------------"
+	echo 
+	echo
+done
