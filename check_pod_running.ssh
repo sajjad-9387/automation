@@ -1,3 +1,4 @@
+
 #!/bin/bash
 
 
@@ -21,12 +22,19 @@ do
 		do
 			echo ""
 			kubectl config use-context "${NAME_SPACE}" &>/dev/null
-			echo "${N} Checking this Namespace:--> ${NAME_SPACE}  found below results" 
+			echo "Namespace:${NAME_SPACE}"
 			echo ""
-			echo "Status  Name"
-			kubectl get pods | tail -n +2 | awk '{print $3 " " $1}' | grep -v 'Completed\|Running'
+			echo "Status  	            Pod_Name"
+			kubectl get pods | tail -n +2 | awk '{print $3 "    " $1}' | grep -v 'Completed\|Running'
+
+			if [[ "${?}" != 0 ]]
+				then
+					echo ""
+					echo "OOPS, Check your VPN or Contact your Admin, please"
+					date
+					echo "<--------------------------->"
+					exit 1
+			fi
+
+			date
 			echo "<------------------->"
-			
-	done
-done
-exit 0
