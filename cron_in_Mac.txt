@@ -1,0 +1,12 @@
+crontab -e
+-----
+Use "launchd" to schedule a script on MacOs (Mac not use Cron)
+For this need to create a "plist" file.
+This file will create here--> ~/Library/LaunchAgents
+example-> touch ~/Library/LaunchAgents/com.example.kubernetes.plist
+edit this file by code will tell when fill execute
+
+then load "launchctl load" (not cron)
+example-> launchctl load ~/Library/LaunchAgents/com.example.......plist
+for stop the run the script run unload
+example-> launchctl unload ~/Library/LaunchAgents/com.example.....plist
