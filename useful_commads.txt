@@ -1,0 +1,12 @@
+Get Container names in pod
+kubectl get pod <pod-name> -o json | jq '.spec.containers[].name'
+
+get env names in pod
+kubectl get pod <pod-name> -o json | jq '.spec.containers[].env'
+
+           all_containers=$(kubectl get pod "${all_pod}" -o json | jq '.spec.containers[].name')
+            echo "This is pod name:-->" "${all_pod}"
+            echo These are continer names below:
+                for all_container in "${all_containers}"; do
+                  echo "${all_container}"
+                done

@@ -1,0 +1,60 @@
+#!/bin/bash
+#this script will check status of the pods on current context
+namespaces=$(kubectl config get-contexts | tail -n +2 | awk {'print $NF'})
+
+for ns in $namespaces; do
+    kubectl config use-context "${ns}" &>/dev/null
+    echo "**********************************"
+    echo "Namespace:" $ns        
+    echo "**********************************"
+    #Will show all pods 
+    all_pods=$(kubectl get pods 2>/dev/null | tail -n +2 | sort -n | awk '{print $1}')
+   
+    for single_pod in $all_pods; do
+         echo "This is Pod name:---> ${single_pod}"
+         echo "These are containers name in the pod" 
+         kubectl get pod "${single_pod}" -o json | jq '.spec.containers[].name'
+         echo ""
+    done
+ 
+
+    #Will show only account/number of pods
+    #total_pods=$(kubectl get pods 2>/dev/null | tail -n +2 | sort -n | wc -l) 
+    #total_error_crash_pods=$(kubectl get pods 2>/dev/null | tail -n +2 | awk '{print $3 "    " $1}' | grep 'Completed\|Running' | wc -l ) 
+
+    
+    #Will Show pods
+    #crash_pods=$(kubectl get pods 2>/dev/null | tail -n +2 | grep  'CrashLoopBackOff' | awk '{print  $1}') 
+    #error_pods=$(kubectl get pods 2>/dev/null | tail -n +2 | grep  'Error' | awk '{print  $1}') 
+
+    #Check that if the previous command is done
+    #if [[ "${?}" != 0 ]]
+    #    then
+     #       echo ""
+      #      echo "OOPS, Check your VPN or Contact your Admin, please"
+       #     date
+        #    echo "<--------------------------->"
+         #   exit 1
+    #fi
+    
+
+
+    #Will show only crashloopp pods
+    #echo "Crashloop:"
+    #    for cp in $crash_pods; do
+    #        echo " - " $cp
+    #    done    
+
+    #Will show only error pods
+    #echo "Error:"
+     #   for rp in $error_pods; do
+     #       echo " - " $rp
+     #   done
+
+
+    #echo
+    #echo Healthy: $total_error_crash_pods/$total_pods pods
+    #echo "---------------------------------------"
+    #echo 
+    #echo
+done
